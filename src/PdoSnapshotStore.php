@@ -95,14 +95,18 @@ EOT;
         if (! $result) {
             return null;
         }
-
-        return new Snapshot(
-            $aggregateType,
-            $aggregateId,
-            $this->unserializeAggregateRoot($result->aggregate_root),
-            (int) $result->last_version,
-            \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u', $result->created_at, new \DateTimeZone('UTC'))
-        );
+        
+        try {
+            return new Snapshot(
+                $aggregateType,
+                $aggregateId,
+                $this->unserializeAggregateRoot($result->aggregate_root),
+                (int) $result->last_version,
+                \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u', $result->created_at, new \DateTimeZone('UTC'))
+            );
+        } catch(\Exception $e) {
+            return null;
+        }
     }
 
     public function save(Snapshot ...$snapshots): void
